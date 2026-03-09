@@ -1,9 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: "/sprout",
-  images: {
-    unoptimized: true,
-  },
+  // basePath removed for Vercel deployment (was "/sprout" for GitHub Pages)
 };
 
 export default nextConfig;
