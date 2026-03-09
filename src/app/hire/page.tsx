@@ -18,6 +18,7 @@ export default function HirePage() {
       company_name: (form.elements.namedItem("company_name") as HTMLInputElement).value,
       contact_name: (form.elements.namedItem("contact_name") as HTMLInputElement).value,
       email: (form.elements.namedItem("email") as HTMLInputElement).value,
+      phone: (form.elements.namedItem("phone") as HTMLInputElement).value,
       role_needed: (form.elements.namedItem("role_needed") as HTMLSelectElement).value,
       hours_per_week: (form.elements.namedItem("hours_per_week") as HTMLSelectElement).value,
       budget_range: (form.elements.namedItem("budget_range") as HTMLSelectElement).value,
@@ -26,8 +27,19 @@ export default function HirePage() {
     };
 
     console.log("Hire request submitted:", data);
-    // In production, POST to your API endpoint
-    // await fetch("/api/hire", { method: "POST", body: JSON.stringify(data) });
+
+    // Trigger Scout call if phone provided
+    if (data.phone) {
+      try {
+        await fetch(`${basePath}/api/scout/trigger`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: data.phone, type: "company", formData: data }),
+        });
+      } catch (err) {
+        console.error("Failed to trigger Scout call:", err);
+      }
+    }
 
     setLoading(false);
     setSubmitted(true);
@@ -101,18 +113,33 @@ export default function HirePage() {
             </div>
           </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              required
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              placeholder="jane@acme.com"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                placeholder="jane@acme.com"
+              />
+            </div>
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-slate-300 mb-2">
+                Phone number
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                required
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                placeholder="+1 (555) 000-0000"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

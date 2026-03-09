@@ -10,6 +10,8 @@ export interface TalentProfile {
   hours_per_week: number | null;
   bio: string | null;
   linkedin_url: string | null;
+  phone: string | null;
+  transcript: string | null;
   created_at: string;
 }
 
@@ -22,6 +24,14 @@ export interface CompanyProfile {
   budget_monthly: number | null;
   hours_per_week: number | null;
   description: string | null;
+  phone: string | null;
+  contact_name: string | null;
+  transcript: string | null;
+  challenge_summary: string | null;
+  subscription_status: "free" | "active" | "cancelled";
+  profiles_sent: number;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
   created_at: string;
 }
 

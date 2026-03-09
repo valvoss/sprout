@@ -28,8 +28,19 @@ export default function JoinPage() {
     };
 
     console.log("Exec application submitted:", data);
-    // In production, POST to your API endpoint
-    // await fetch("/api/join", { method: "POST", body: JSON.stringify(data) });
+
+    // Trigger Scout call if phone provided
+    if (data.phone) {
+      try {
+        await fetch(`${basePath}/api/scout/trigger`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: data.phone, type: "talent", formData: data }),
+        });
+      } catch (err) {
+        console.error("Failed to trigger Scout call:", err);
+      }
+    }
 
     setLoading(false);
     setSubmitted(true);

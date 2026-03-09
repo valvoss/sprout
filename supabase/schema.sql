@@ -94,3 +94,28 @@ create index idx_company_profiles_user_id on company_profiles(user_id);
 create index idx_matches_talent_id on matches(talent_id);
 create index idx_matches_company_id on matches(company_id);
 create index idx_introductions_match_id on introductions(match_id);
+
+-- Enable pgvector for embeddings
+create extension if not exists "vector";
+
+-- Add subscription tracking to company_profiles
+alter table company_profiles
+  add column if not exists subscription_status text default 'free' check (subscription_status in ('free', 'active', 'cancelled')),
+  add column if not exists profiles_sent integer default 0,
+  add column if not exists stripe_customer_id text,
+  add column if not exists stripe_subscription_id text,
+  add column if not exists phone text,
+  add column if not exists contact_name text,
+  add column if not exists transcript text,
+  add column if not exists embedding vector(1536),
+  add column if not exists challenge_summary text;
+
+-- Add phone + transcript to talent_profiles
+alter table talent_profiles
+  add column if not exists phone text,
+  add column if not exists transcript text,
+  add column if not exists embedding vector(1536);
+
+-- Phone lookup indexes
+create index if not exists idx_company_profiles_phone on company_profiles(phone);
+create index if not exists idx_talent_profiles_phone on talent_profiles(phone);
