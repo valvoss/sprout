@@ -1,5 +1,3 @@
-import * as cheerio from "cheerio";
-
 export interface Job {
   title: string;
   company: string;
@@ -12,168 +10,101 @@ export interface Job {
 
 function classifyRole(text: string): Job["roleType"] {
   const t = text.toUpperCase();
-  if (t.includes("CFO") || t.includes("CHIEF FINANCIAL") || t.includes("FINANCE"))
+  if (t.includes("CFO") || t.includes("CHIEF FINANCIAL") || t.includes("CHIEF FINANCE") || t.includes("VP FINANCE") || t.includes("VP OF FINANCE"))
     return "CFO";
-  if (t.includes("CMO") || t.includes("CHIEF MARKETING") || t.includes("MARKETING"))
+  if (t.includes("CMO") || t.includes("CHIEF MARKETING") || t.includes("VP MARKETING") || t.includes("VP OF MARKETING"))
     return "CMO";
-  if (t.includes("COO") || t.includes("CHIEF OPERATING") || t.includes("OPERATIONS"))
+  if (t.includes("COO") || t.includes("CHIEF OPERATING") || t.includes("VP OPERATIONS") || t.includes("VP OF OPERATIONS"))
     return "COO";
-  if (t.includes("CTO") || t.includes("CHIEF TECHNOLOGY") || t.includes("TECHNOLOGY") || t.includes("ENGINEERING"))
+  if (t.includes("CTO") || t.includes("CHIEF TECHNOLOGY") || t.includes("CHIEF TECHNICAL") || t.includes("VP ENGINEERING") || t.includes("VP OF ENGINEERING"))
     return "CTO";
   return "Other";
 }
 
-async function scrapeGoFractional(): Promise<Job[]> {
-  try {
-    const res = await fetch("https://www.gofractional.com/roles", {
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; SproutBot/1.0)" },
-      signal: AbortSignal.timeout(10000),
-    });
-    if (!res.ok) return [];
-    const html = await res.text();
-    const $ = cheerio.load(html);
-    const jobs: Job[] = [];
-
-    // GoFractional lists roles in card-like elements
-    $("a[href*='/roles/']").each((_, el) => {
-      const $el = $(el);
-      const href = $el.attr("href") || "";
-      if (!href || href === "/roles/") return;
-
-      const text = $el.text().trim();
-      const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
-      if (lines.length === 0) return;
-
-      const title = lines[0];
-      const company = lines[1] || "Confidential";
-      const location = lines.find((l) => /remote|hybrid|on-site|city|state/i.test(l)) || "Remote";
-
-      const url = href.startsWith("http") ? href : `https://www.gofractional.com${href}`;
-
-      // Avoid duplicates
-      if (jobs.some((j) => j.url === url)) return;
-
-      jobs.push({
-        title,
-        company,
-        roleType: classifyRole(title),
-        location,
-        posted_at: new Date().toISOString(),
-        source: "GoFractional",
-        url,
-      });
-    });
-
-    return jobs;
-  } catch (e) {
-    console.error("GoFractional scrape error:", e);
-    return [];
-  }
+function slugToTitleCase(slug: string): string {
+  return slug
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
 }
 
-async function scrapeFractionalJobs(): Promise<Job[]> {
+function parseJobSlug(url: string): { title: string; company: string } | null {
+  // URL format: https://www.fractionaljobs.io/jobs/job-title-at-company-name
+  const match = url.match(/\/jobs\/(.+)$/);
+  if (!match) return null;
+  const slug = match[1];
+  const atIdx = slug.lastIndexOf("-at-");
+  if (atIdx === -1) return null;
+  const titleSlug = slug.slice(0, atIdx);
+  const companySlug = slug.slice(atIdx + 4);
+  return {
+    title: slugToTitleCase(titleSlug),
+    company: slugToTitleCase(companySlug),
+  };
+}
+
+// Keywords that indicate a true exec-level fractional role
+const EXEC_KEYWORDS = [
+  "fractional-cfo", "fractional-cmo", "fractional-coo", "fractional-cto",
+  "chief-financial-officer", "chief-finance-officer", "chief-marketing-officer",
+  "chief-operating-officer", "chief-technology-officer", "chief-technical-officer",
+  "-cfo-", "-cmo-", "-coo-", "-cto-",
+  "cfo-", "cmo-", "coo-", "cto-",
+  "-cfo", "-cmo", "-coo", "-cto",
+  "vp-finance", "vp-of-finance", "vp-marketing", "vp-of-marketing",
+  "vp-operations", "vp-of-operations", "vp-engineering", "vp-of-engineering",
+];
+
+async function scrapeFractionalJobsSitemap(): Promise<Job[]> {
   try {
-    const res = await fetch("https://www.fractionaljobs.io", {
+    const res = await fetch("https://www.fractionaljobs.io/sitemap.xml", {
       headers: { "User-Agent": "Mozilla/5.0 (compatible; SproutBot/1.0)" },
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(15000),
     });
     if (!res.ok) return [];
-    const html = await res.text();
-    const $ = cheerio.load(html);
+    const xml = await res.text();
+
+    // Extract all job URLs
+    const urlMatches = xml.matchAll(/<loc>(https:\/\/www\.fractionaljobs\.io\/jobs\/[^<]+)<\/loc>/g);
     const jobs: Job[] = [];
 
-    // FractionalJobs.io lists jobs in cards/list items with links
-    $("a[href*='job'], a[href*='position'], a[href*='role'], .job-card, .job-listing, [class*='job']").each((_, el) => {
-      const $el = $(el);
-      const href = $el.attr("href") || "";
-      const text = $el.text().trim();
-      const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
-      if (lines.length === 0) return;
+    for (const match of urlMatches) {
+      const url = match[1];
+      const slug = url.toLowerCase();
 
-      const title = lines[0];
-      const company = lines[1] || "Confidential";
-      const location = lines.find((l) => /remote|hybrid|on-site/i.test(l)) || "Remote";
-      const url = href.startsWith("http") ? href : `https://www.fractionaljobs.io${href}`;
+      // Only include exec-level roles
+      if (!EXEC_KEYWORDS.some((kw) => slug.includes(kw))) continue;
 
-      if (jobs.some((j) => j.url === url)) return;
+      const parsed = parseJobSlug(url);
+      if (!parsed) continue;
+
+      const roleType = classifyRole(parsed.title);
+      if (roleType === "Other") continue; // Skip anything we can't classify
 
       jobs.push({
-        title,
-        company,
-        roleType: classifyRole(title),
-        location,
+        title: parsed.title,
+        company: parsed.company,
+        roleType,
+        location: "Remote",
         posted_at: new Date().toISOString(),
         source: "FractionalJobs.io",
         url,
       });
-    });
+    }
 
     return jobs;
   } catch (e) {
-    console.error("FractionalJobs.io scrape error:", e);
-    return [];
-  }
-}
-
-async function scrapePeoplePath(): Promise<Job[]> {
-  try {
-    const res = await fetch("https://www.thepeoplepath.com/fractional-jobs", {
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; SproutBot/1.0)" },
-      signal: AbortSignal.timeout(10000),
-    });
-    if (!res.ok) return [];
-    const html = await res.text();
-    const $ = cheerio.load(html);
-    const jobs: Job[] = [];
-
-    $("a[href*='job'], .job-listing, .job-card, [class*='job'], [class*='listing']").each((_, el) => {
-      const $el = $(el);
-      const href = $el.attr("href") || "";
-      const text = $el.text().trim();
-      const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
-      if (lines.length === 0) return;
-
-      const title = lines[0];
-      const company = lines[1] || "Confidential";
-      const location = lines.find((l) => /remote|hybrid|on-site/i.test(l)) || "Remote";
-      const url = href.startsWith("http") ? href : `https://www.thepeoplepath.com${href}`;
-
-      if (jobs.some((j) => j.url === url)) return;
-
-      jobs.push({
-        title,
-        company,
-        roleType: classifyRole(title),
-        location,
-        posted_at: new Date().toISOString(),
-        source: "The People Path",
-        url,
-      });
-    });
-
-    return jobs;
-  } catch (e) {
-    console.error("PeoplePath scrape error:", e);
+    console.error("FractionalJobs.io sitemap error:", e);
     return [];
   }
 }
 
 export async function scrapeAllJobs(): Promise<Job[]> {
-  const results = await Promise.allSettled([
-    scrapeGoFractional(),
-    scrapeFractionalJobs(),
-    scrapePeoplePath(),
-  ]);
+  const jobs = await scrapeFractionalJobsSitemap();
 
-  const jobs: Job[] = [];
-  for (const result of results) {
-    if (result.status === "fulfilled") {
-      jobs.push(...result.value);
-    }
-  }
-
-  // Sort by posted_at desc
-  jobs.sort((a, b) => new Date(b.posted_at).getTime() - new Date(a.posted_at).getTime());
+  // Sort by roleType grouping: CFO first (most relevant for Beck's audience), then CMO, COO, CTO
+  const order: Record<Job["roleType"], number> = { CFO: 0, CMO: 1, COO: 2, CTO: 3, Other: 4 };
+  jobs.sort((a, b) => order[a.roleType] - order[b.roleType]);
 
   return jobs;
 }
