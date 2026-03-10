@@ -2,17 +2,6 @@ import { Job } from "@/lib/scraper";
 
 const ROLE_TYPES = ["All", "CFO", "CMO", "COO", "CTO"] as const;
 
-function timeAgo(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  if (days === 1) return "1 day ago";
-  return `${days} days ago`;
-}
-
 async function getJobs(): Promise<Job[]> {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -39,18 +28,16 @@ function JobCard({ job }: { job: Job }) {
         </span>
       </div>
 
-      <div className="flex items-center gap-4 text-sm text-slate-400">
-        <span>{job.location}</span>
-        <span className="text-slate-600">·</span>
-        <span>{timeAgo(job.posted_at)}</span>
-        <span className="text-slate-600">·</span>
-        <span>{job.source}</span>
+      <div className="space-y-1 text-sm">
+        <div><span className="text-slate-400">{"\ud83d\udcc5"} Weekly:</span> <span className="text-slate-200">{job.weekly_hours || "\u2014"}</span></div>
+        <div><span className="text-slate-400">{"\ud83d\udcb0"} Comp:</span> <span className="text-slate-200">{job.comp_range || "\u2014"}</span></div>
+        <div><span className="text-slate-400">{"\ud83c\udfe2"} Stage:</span> <span className="text-slate-200">{job.company_stage || "\u2014"}</span></div>
+        <div><span className="text-slate-400">{"\ud83c\udfed"} Industry:</span> <span className="text-slate-200">{job.industry || "\u2014"}</span></div>
+        <div><span className="text-slate-400">{"\ud83d\udccd"} Location:</span> <span className="text-slate-200">{job.location || "\u2014"}</span></div>
       </div>
 
       <a
-        href={job.url}
-        target="_blank"
-        rel="noopener noreferrer"
+        href={`/jobs/${job.slug}`}
         className="mt-auto inline-flex items-center justify-center px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-full transition-colors text-sm w-fit"
       >
         View role
@@ -81,7 +68,6 @@ export default async function JobsPage() {
   return (
     <main className="min-h-screen bg-slate-900">
       <div className="max-w-6xl mx-auto px-6 py-16 md:py-24">
-        {/* Header */}
         <div className="mb-12">
           <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-1.5 mb-6">
             <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
@@ -95,7 +81,6 @@ export default async function JobsPage() {
           </p>
         </div>
 
-        {/* Filter + Jobs — client-side filtering via script */}
         <FilterBar />
 
         {jobs.length > 0 ? (
@@ -115,7 +100,6 @@ export default async function JobsPage() {
         )}
       </div>
 
-      {/* Client-side filter script */}
       <script
         dangerouslySetInnerHTML={{
           __html: `
