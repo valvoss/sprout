@@ -24,13 +24,32 @@ const serviceSupabase = createClient(
 
 function classifyRole(text: string): Job["roleType"] {
   const t = text.toUpperCase();
-  if (t.includes("CFO") || t.includes("CHIEF FINANCIAL") || t.includes("CHIEF FINANCE") || t.includes("VP FINANCE") || t.includes("VP OF FINANCE"))
+  // CFO / Finance
+  if (t.includes("CFO") || t.includes("CHIEF FINANCIAL") || t.includes("CHIEF FINANCE") ||
+      t.includes("VP FINANCE") || t.includes("VP OF FINANCE") ||
+      t.includes("FINANCE DIRECTOR") || t.includes("DIRECTOR OF FINANCE") ||
+      t.includes("HEAD OF FINANCE") || t.includes("CONTROLLER") || t.includes("STRATEGIC FINANCE"))
     return "CFO";
-  if (t.includes("CMO") || t.includes("CHIEF MARKETING") || t.includes("VP MARKETING") || t.includes("VP OF MARKETING"))
+  // CMO / Marketing
+  if (t.includes("CMO") || t.includes("CHIEF MARKETING") ||
+      t.includes("VP MARKETING") || t.includes("VP OF MARKETING") ||
+      t.includes("HEAD OF MARKETING") || t.includes("DIRECTOR OF MARKETING") ||
+      t.includes("MARKETING DIRECTOR") || t.includes("HEAD OF GROWTH") ||
+      t.includes("CHIEF REVENUE") || t.includes("CRO"))
     return "CMO";
-  if (t.includes("COO") || t.includes("CHIEF OPERATING") || t.includes("VP OPERATIONS") || t.includes("VP OF OPERATIONS"))
+  // COO / Operations
+  if (t.includes("COO") || t.includes("CHIEF OPERATING") ||
+      t.includes("VP OPERATIONS") || t.includes("VP OF OPERATIONS") ||
+      t.includes("HEAD OF OPERATIONS") || t.includes("DIRECTOR OF OPERATIONS") ||
+      t.includes("OPERATIONS DIRECTOR") || t.includes("GENERAL MANAGER") ||
+      t.includes("CHIEF OF STAFF") || t.includes("OPERATING PARTNER"))
     return "COO";
-  if (t.includes("CTO") || t.includes("CHIEF TECHNOLOGY") || t.includes("CHIEF TECHNICAL") || t.includes("VP ENGINEERING") || t.includes("VP OF ENGINEERING"))
+  // CTO / Engineering / Technology
+  if (t.includes("CTO") || t.includes("CHIEF TECHNOLOGY") || t.includes("CHIEF TECHNICAL") ||
+      t.includes("VP ENGINEERING") || t.includes("VP OF ENGINEERING") ||
+      t.includes("HEAD OF ENGINEERING") || t.includes("DIRECTOR OF ENGINEERING") ||
+      t.includes("ENGINEERING DIRECTOR") || t.includes("HEAD OF TECHNOLOGY") ||
+      t.includes("CHIEF INFORMATION") || t.includes("CISO") || t.includes("CIO"))
     return "CTO";
   return "Other";
 }

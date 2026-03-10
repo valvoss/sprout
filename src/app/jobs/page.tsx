@@ -1,15 +1,12 @@
-import { Job } from "@/lib/scraper";
+import { Job, getJobsFromDB } from "@/lib/scraper";
+
+export const dynamic = "force-dynamic";
 
 const ROLE_TYPES = ["All", "CFO", "CMO", "COO", "CTO"] as const;
 
 async function getJobs(): Promise<Job[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/jobs`, {
-      next: { revalidate: 1800 },
-    });
-    if (!res.ok) return [];
-    return res.json();
+    return await getJobsFromDB();
   } catch {
     return [];
   }
