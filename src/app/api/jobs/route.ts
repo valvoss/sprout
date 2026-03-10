@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getJobsFromDB } from "@/lib/scraper";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const jobs = await getJobsFromDB();
