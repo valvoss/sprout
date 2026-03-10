@@ -1,10 +1,13 @@
+import { unstable_noStore as noStore } from "next/cache";
 import { Job, getJobsFromDB } from "@/lib/scraper";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const ROLE_TYPES = ["All", "CFO", "CMO", "COO", "CTO"] as const;
 
 async function getJobs(): Promise<Job[]> {
+  noStore();
   try {
     return await getJobsFromDB();
   } catch {
