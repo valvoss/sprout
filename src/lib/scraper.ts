@@ -299,7 +299,7 @@ export async function scrapeAndStoreJobs(): Promise<number> {
 
     const { error } = await serviceSupabase
       .from("jobs")
-      .upsert(rows, { onConflict: "slug" });
+      .upsert(rows, { onConflict: "slug", ignoreDuplicates: false });
 
     if (error) {
       console.error("Supabase upsert error:", error);
