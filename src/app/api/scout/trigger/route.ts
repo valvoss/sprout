@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       } catch (callError) {
         console.error("Failed to trigger Scout call:", callError);
       }
-    }, 5 * 60 * 1000);
+    }, 1 * 60 * 1000);
 
     return NextResponse.json({ success: true, message: "Scout call scheduled" });
   } catch (error) {
