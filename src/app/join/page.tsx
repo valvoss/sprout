@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
-const basePath = process.env.NODE_ENV === "production" ? "/sprout" : "";
+const basePath = "";
 
 export default function JoinPage() {
   const [submitted, setSubmitted] = useState(false);
