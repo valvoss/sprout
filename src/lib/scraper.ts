@@ -65,11 +65,12 @@ async function scrapeFractionalJobsSitemap(): Promise<Job[]> {
     const xml = await res.text();
 
     // Extract all job URLs
-    const urlMatches = xml.matchAll(/<loc>(https:\/\/www\.fractionaljobs\.io\/jobs\/[^<]+)<\/loc>/g);
+    const locRegex = /<loc>(https:\/\/www\.fractionaljobs\.io\/jobs\/[^<]+)<\/loc>/g;
     const jobs: Job[] = [];
+    let regexMatch: RegExpExecArray | null;
 
-    for (const match of urlMatches) {
-      const url = match[1];
+    while ((regexMatch = locRegex.exec(xml)) !== null) {
+      const url = regexMatch[1];
       const slug = url.toLowerCase();
 
       // Only include exec-level roles
