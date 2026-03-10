@@ -22,15 +22,24 @@ export default function JoinPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
+  const [industriesExpanded, setIndustriesExpanded] = useState(false);
   const [otherIndustry, setOtherIndustry] = useState("");
   const [rateAmount, setRateAmount] = useState("");
   const [rateUnit, setRateUnit] = useState<"/hr" | "/mo">("/hr");
 
   function toggleIndustry(industry: string) {
+    if (industry === "Other") {
+      setSelectedIndustries((prev) =>
+        prev.includes("Other") ? prev.filter((i) => i !== "Other") : [...prev, "Other"]
+      );
+      return;
+    }
     setSelectedIndustries((prev) =>
       prev.includes(industry) ? prev.filter((i) => i !== industry) : [...prev, industry]
     );
   }
+
+  const visibleIndustries = industriesExpanded ? TOP_INDUSTRIES : TOP_INDUSTRIES.slice(0, 5);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -39,8 +48,8 @@ export default function JoinPage() {
     const form = e.currentTarget;
 
     const industriesList = [
-      ...selectedIndustries,
-      ...(otherIndustry.trim() ? [otherIndustry.trim()] : []),
+      ...selectedIndustries.filter((i) => i !== "Other"),
+      ...(selectedIndustries.includes("Other") && otherIndustry.trim() ? [otherIndustry.trim()] : []),
     ].join(", ");
 
     const rateHourly = rateUnit === "/hr" ? rateAmount : "";
@@ -216,8 +225,8 @@ export default function JoinPage() {
             <label className="block text-sm font-medium text-slate-300 mb-3">
               Industries served
             </label>
-            <div className="flex flex-wrap gap-2 mb-3">
-              {TOP_INDUSTRIES.map((industry) => (
+            <div className="flex flex-wrap gap-2">
+              {visibleIndustries.map((industry) => (
                 <button
                   key={industry}
                   type="button"
@@ -231,14 +240,36 @@ export default function JoinPage() {
                   {industry}
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={() => toggleIndustry("Other")}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                  selectedIndustries.includes("Other")
+                    ? "bg-emerald-500 border-emerald-500 text-white"
+                    : "bg-slate-900 border-slate-600 text-slate-300 hover:border-slate-400"
+                }`}
+              >
+                Other
+              </button>
+              {!industriesExpanded && (
+                <button
+                  type="button"
+                  onClick={() => setIndustriesExpanded(true)}
+                  className="px-3 py-1.5 rounded-full text-sm font-medium border border-dashed border-slate-600 text-slate-400 hover:border-slate-400 hover:text-slate-300 transition-colors"
+                >
+                  + More
+                </button>
+              )}
             </div>
-            <input
-              type="text"
-              placeholder="Other (e.g. Climate Tech, Legal Tech...)"
-              value={otherIndustry}
-              onChange={(e) => setOtherIndustry(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-            />
+            {selectedIndustries.includes("Other") && (
+              <input
+                type="text"
+                placeholder="e.g. Climate Tech, Legal Tech..."
+                value={otherIndustry}
+                onChange={(e) => setOtherIndustry(e.target.value)}
+                className="mt-3 w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+              />
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

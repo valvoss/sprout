@@ -23,12 +23,19 @@ export default function HirePage() {
   const [loading, setLoading] = useState(false);
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   const [industriesExpanded, setIndustriesExpanded] = useState(false);
+  const [otherIndustry, setOtherIndustry] = useState("");
   const [roleNeeded, setRoleNeeded] = useState("");
   const [otherRole, setOtherRole] = useState("");
   const [budgetAmount, setBudgetAmount] = useState("");
   const [budgetUnit, setBudgetUnit] = useState<"/hr" | "/mo">("/hr");
 
   function toggleIndustry(industry: string) {
+    if (industry === "Other") {
+      setSelectedIndustries((prev) =>
+        prev.includes("Other") ? prev.filter((i) => i !== "Other") : [...prev, "Other"]
+      );
+      return;
+    }
     setSelectedIndustries((prev) =>
       prev.includes(industry) ? prev.filter((i) => i !== industry) : [...prev, industry]
     );
@@ -56,7 +63,10 @@ export default function HirePage() {
       budget_hourly: budgetHourly,
       budget_monthly: budgetMonthly,
       budget_range: `$${budgetAmount}${budgetUnit}`,
-      industry: selectedIndustries.join(", "),
+      industry: [
+        ...selectedIndustries.filter((i) => i !== "Other"),
+        ...(selectedIndustries.includes("Other") && otherIndustry.trim() ? [otherIndustry.trim()] : []),
+      ].join(", "),
       description: (form.elements.namedItem("description") as HTMLTextAreaElement).value,
     };
 
@@ -274,6 +284,17 @@ export default function HirePage() {
                   {industry}
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={() => toggleIndustry("Other")}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                  selectedIndustries.includes("Other")
+                    ? "bg-emerald-500 border-emerald-500 text-white"
+                    : "bg-slate-900 border-slate-600 text-slate-300 hover:border-slate-400"
+                }`}
+              >
+                Other
+              </button>
               {!industriesExpanded && (
                 <button
                   type="button"
@@ -284,6 +305,15 @@ export default function HirePage() {
                 </button>
               )}
             </div>
+            {selectedIndustries.includes("Other") && (
+              <input
+                type="text"
+                placeholder="e.g. Climate Tech, Legal Tech..."
+                value={otherIndustry}
+                onChange={(e) => setOtherIndustry(e.target.value)}
+                className="mt-3 w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+              />
+            )}
           </div>
 
           <div>
