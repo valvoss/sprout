@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "src/app/api/jobs/refresh/route.ts": {
+      "maxDuration": 60
+    }
+  }
+}

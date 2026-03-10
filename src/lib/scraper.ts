@@ -59,15 +59,47 @@ function slugToTitleCase(slug: string): string {
     .join(" ");
 }
 
+// Exec/leadership roles to include - broader than just C-suite
 const EXEC_KEYWORDS = [
-  "cfo", "cmo", "coo", "cto",
+  "cfo", "cmo", "coo", "cto", "cro", "cpo",
   "chief-financial", "chief-marketing", "chief-operating", "chief-technology",
+  "chief-revenue", "chief-product", "chief-finance",
   "fractional-cfo", "fractional-cmo", "fractional-coo", "fractional-cto",
-  "vp-finance", "vp-marketing", "vp-operations", "vp-engineering",
+  "vp-finance", "vp-of-finance", "vp-marketing", "vp-of-marketing",
+  "vp-operations", "vp-of-operations", "vp-engineering", "vp-of-engineering",
+  "head-of-finance", "head-of-marketing", "head-of-operations", "head-of-engineering",
+  "head-of-technology", "head-of-growth",
+  "finance-director", "director-of-finance", "director-of-operations",
+  "director-of-marketing", "director-of-engineering",
+  "strategic-finance", "general-manager",
+  "operating-partner", "controller",
 ];
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function getActiveJobUrls(): Promise<string[]> {
+  // Scrape the homepage which shows currently active listings
+  const res = await fetch("https://www.fractionaljobs.io", {
+    headers: { "User-Agent": "Mozilla/5.0 (compatible; SproutBot/1.0)" },
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!res.ok) return [];
+  const html = await res.text();
+  // Extract all unique /jobs/ hrefs
+  const linkRegex = /href="(\/jobs\/[a-z0-9][a-z0-9-]+)"/g;
+  const seen = new Set<string>();
+  const urls: string[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = linkRegex.exec(html)) !== null) {
+    const url = `https://www.fractionaljobs.io${m[1]}`;
+    if (!seen.has(url)) {
+      seen.add(url);
+      urls.push(url);
+    }
+  }
+  return urls;
 }
 
 function extractLabeledField($: cheerio.CheerioAPI, label: string): string {
@@ -129,53 +161,45 @@ function extractDescription($: cheerio.CheerioAPI): string {
 }
 
 export async function scrapeAndStoreJobs(): Promise<number> {
-  // 1. Fetch sitemap
-  const sitemapRes = await fetch("https://www.fractionaljobs.io/sitemap.xml", {
-    headers: { "User-Agent": "Mozilla/5.0 (compatible; SproutBot/1.0)" },
-    signal: AbortSignal.timeout(15000),
-  });
-  if (!sitemapRes.ok) throw new Error(`Sitemap fetch failed: ${sitemapRes.status}`);
-  const xml = await sitemapRes.text();
+  // 1. Get active job URLs from the homepage (these are all currently open)
+  const allUrls = await getActiveJobUrls();
 
-  // 2. Extract all /jobs/ URLs
-  const locRegex = /<loc>(https:\/\/www\.fractionaljobs\.io\/jobs\/[^<]+)<\/loc>/g;
-  const urls: string[] = [];
-  let regexMatch: RegExpExecArray | null;
-  while ((regexMatch = locRegex.exec(xml)) !== null) {
-    urls.push(regexMatch[1]);
-  }
-
-  // 3. Filter to exec-level only
-  const execUrls = urls.filter((url) => {
+  // 2. Filter to exec/leadership roles
+  const execUrls = allUrls.filter((url) => {
     const slug = url.toLowerCase();
     return EXEC_KEYWORDS.some((kw) => slug.includes(kw));
   });
 
-  // Limit to 120
-  const toScrape = execUrls.slice(0, 120);
+  // Also include any remaining URLs that aren't clearly non-exec
+  // (homepage jobs are curated fractional roles anyway)
+  const nonExecUrls = allUrls.filter((url) => !execUrls.includes(url));
+
+  const toScrape = [...execUrls, ...nonExecUrls].slice(0, 60);
   const jobs: Job[] = [];
 
-  // 4. Scrape each page
-  for (let i = 0; i < toScrape.length; i++) {
-    const url = toScrape[i];
-    if (i > 0) await delay(400);
+  // 4. Scrape each page (batch of 5 concurrent, 200ms between batches)
+  const BATCH_SIZE = 5;
+  for (let i = 0; i < toScrape.length; i += BATCH_SIZE) {
+    const batch = toScrape.slice(i, i + BATCH_SIZE);
+    if (i > 0) await delay(200);
+    await Promise.all(batch.map(async (url) => {
 
     try {
       const res = await fetch(url, {
         headers: { "User-Agent": "Mozilla/5.0 (compatible; SproutBot/1.0)" },
         signal: AbortSignal.timeout(15000),
       });
-      if (!res.ok) continue;
+      if (!res.ok) return;
       const html = await res.text();
       const $ = cheerio.load(html);
 
       // Check if closed
       const pageText = $("body").text();
-      if (pageText.includes("This Role is Closed")) continue;
+      if (pageText.includes("This Role is Closed")) return;
 
       // Extract slug from URL
       const slugMatch = url.match(/\/jobs\/(.+)$/);
-      if (!slugMatch) continue;
+      if (!slugMatch) return;
       const slug = slugMatch[1];
 
       // Parse title from h1
@@ -233,7 +257,8 @@ export async function scrapeAndStoreJobs(): Promise<number> {
     } catch (e) {
       console.error(`Error scraping ${url}:`, e);
     }
-  }
+    })); // end Promise.all
+  } // end batch loop
 
   // 5. Upsert into Supabase
   if (jobs.length > 0) {
