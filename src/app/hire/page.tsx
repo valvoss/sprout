@@ -3,25 +3,61 @@
 import { useState } from "react";
 import Link from "next/link";
 
+const TOP_INDUSTRIES = [
+  "SaaS / Software",
+  "Fintech",
+  "Healthcare / Health Tech",
+  "E-commerce / Retail",
+  "AI / ML",
+  "Real Estate / PropTech",
+  "Media / AdTech",
+  "Manufacturing / Industrial",
+  "Consumer Goods / CPG",
+  "Defense / Government",
+];
+
+const HOURS_OPTIONS = Array.from({ length: 19 }, (_, i) => 4 + i * 2);
+
 export default function HirePage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
+  const [industriesExpanded, setIndustriesExpanded] = useState(false);
+  const [roleNeeded, setRoleNeeded] = useState("");
+  const [otherRole, setOtherRole] = useState("");
+  const [budgetAmount, setBudgetAmount] = useState("");
+  const [budgetUnit, setBudgetUnit] = useState<"/hr" | "/mo">("/hr");
+
+  function toggleIndustry(industry: string) {
+    setSelectedIndustries((prev) =>
+      prev.includes(industry) ? prev.filter((i) => i !== industry) : [...prev, industry]
+    );
+  }
+
+  const visibleIndustries = industriesExpanded ? TOP_INDUSTRIES : TOP_INDUSTRIES.slice(0, 5);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
 
     const form = e.currentTarget;
+
+    const budgetHourly = budgetUnit === "/hr" ? budgetAmount : "";
+    const budgetMonthly = budgetUnit === "/mo" ? budgetAmount : "";
+    const finalRole = roleNeeded === "Other" ? otherRole : roleNeeded;
+
     const data = {
       company_name: (form.elements.namedItem("company_name") as HTMLInputElement).value,
       contact_name: (form.elements.namedItem("contact_name") as HTMLInputElement).value,
       email: (form.elements.namedItem("email") as HTMLInputElement).value,
       phone: (form.elements.namedItem("phone") as HTMLInputElement).value,
-      role_needed: (form.elements.namedItem("role_needed") as HTMLSelectElement).value,
+      role_needed: finalRole,
       hours_per_week: (form.elements.namedItem("hours_per_week") as HTMLSelectElement).value,
-      budget_range: (form.elements.namedItem("budget_range") as HTMLSelectElement).value,
+      budget_hourly: budgetHourly,
+      budget_monthly: budgetMonthly,
+      budget_range: `$${budgetAmount}${budgetUnit}`,
+      industry: selectedIndustries.join(", "),
       description: (form.elements.namedItem("description") as HTMLTextAreaElement).value,
-      industry: (form.elements.namedItem("industry") as HTMLInputElement).value,
     };
 
     console.log("Hire request submitted:", data);
@@ -140,6 +176,7 @@ export default function HirePage() {
             </div>
           </div>
 
+          {/* Role + Hours + Budget */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <label htmlFor="role_needed" className="block text-sm font-medium text-slate-300 mb-2">
@@ -149,6 +186,8 @@ export default function HirePage() {
                 id="role_needed"
                 name="role_needed"
                 required
+                value={roleNeeded}
+                onChange={(e) => setRoleNeeded(e.target.value)}
                 className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               >
                 <option value="">Select role</option>
@@ -158,6 +197,16 @@ export default function HirePage() {
                 <option value="CTO">CTO</option>
                 <option value="Other">Other</option>
               </select>
+              {roleNeeded === "Other" && (
+                <input
+                  type="text"
+                  placeholder="Specify role..."
+                  value={otherRole}
+                  onChange={(e) => setOtherRole(e.target.value)}
+                  required
+                  className="mt-2 w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                />
+              )}
             </div>
             <div>
               <label htmlFor="hours_per_week" className="block text-sm font-medium text-slate-300 mb-2">
@@ -170,41 +219,71 @@ export default function HirePage() {
                 className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               >
                 <option value="">Select</option>
-                <option value="10">10 hrs/wk</option>
-                <option value="20">20 hrs/wk</option>
-                <option value="30">30 hrs/wk</option>
+                {HOURS_OPTIONS.map((h) => (
+                  <option key={h} value={h}>{h} hrs/wk</option>
+                ))}
               </select>
             </div>
             <div>
-              <label htmlFor="budget_range" className="block text-sm font-medium text-slate-300 mb-2">
-                Budget range
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Budget
               </label>
-              <select
-                id="budget_range"
-                name="budget_range"
-                required
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              >
-                <option value="">Select</option>
-                <option value="3-5k">$3–5k/mo</option>
-                <option value="5-8k">$5–8k/mo</option>
-                <option value="8k+">$8k+/mo</option>
-              </select>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="25"
+                    value={budgetAmount}
+                    onChange={(e) => setBudgetAmount(e.target.value)}
+                    placeholder={budgetUnit === "/hr" ? "200" : "8000"}
+                    required
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-7 pr-2 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                </div>
+                <select
+                  value={budgetUnit}
+                  onChange={(e) => setBudgetUnit(e.target.value as "/hr" | "/mo")}
+                  className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                >
+                  <option value="/hr">/hr</option>
+                  <option value="/mo">/mo</option>
+                </select>
+              </div>
             </div>
           </div>
 
+          {/* Industry pills */}
           <div>
-            <label htmlFor="industry" className="block text-sm font-medium text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-slate-300 mb-3">
               Industry
             </label>
-            <input
-              type="text"
-              id="industry"
-              name="industry"
-              required
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              placeholder="SaaS, Healthcare, Fintech..."
-            />
+            <div className="flex flex-wrap gap-2">
+              {visibleIndustries.map((industry) => (
+                <button
+                  key={industry}
+                  type="button"
+                  onClick={() => toggleIndustry(industry)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                    selectedIndustries.includes(industry)
+                      ? "bg-emerald-500 border-emerald-500 text-white"
+                      : "bg-slate-900 border-slate-600 text-slate-300 hover:border-slate-400"
+                  }`}
+                >
+                  {industry}
+                </button>
+              ))}
+              {!industriesExpanded && (
+                <button
+                  type="button"
+                  onClick={() => setIndustriesExpanded(true)}
+                  className="px-3 py-1.5 rounded-full text-sm font-medium border border-dashed border-slate-600 text-slate-400 hover:border-slate-400 hover:text-slate-300 transition-colors"
+                >
+                  + More
+                </button>
+              )}
+            </div>
           </div>
 
           <div>
