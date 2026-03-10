@@ -193,9 +193,9 @@ export async function scrapeAndStoreJobs(): Promise<number> {
       const html = await res.text();
       const $ = cheerio.load(html);
 
-      // Check if closed
-      const pageText = $("body").text();
-      if (pageText.includes("This Role is Closed")) return;
+      // Check if closed - Webflow keeps hidden variants in DOM, so check only visible container
+      const isClosed = $(".home-jobs_hiring-block-jobs:not(.w-condition-invisible)").text().includes("This Role is Closed");
+      if (isClosed) return;
 
       // Extract slug from URL
       const slugMatch = url.match(/\/jobs\/(.+)$/);
