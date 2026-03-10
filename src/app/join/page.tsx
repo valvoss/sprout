@@ -3,8 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 
-const basePath = "";
-
 export default function JoinPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,7 +30,7 @@ export default function JoinPage() {
     // Trigger Scout call if phone provided
     if (data.phone) {
       try {
-        await fetch(`${basePath}/api/scout/trigger`, {
+        await fetch(`/api/scout/trigger`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ phone: data.phone, type: "talent", formData: data }),
@@ -60,7 +58,7 @@ export default function JoinPage() {
             Scout will review your profile and reach out within 48 hours.
           </p>
           <Link
-            href={`${basePath}/`}
+            href="/"
             className="inline-flex items-center justify-center px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-full transition-colors"
           >
             Back to home
@@ -73,7 +71,7 @@ export default function JoinPage() {
   return (
     <div className="min-h-screen bg-slate-900 text-white">
       <div className="max-w-2xl mx-auto px-6 py-16 md:py-24">
-        <Link href={`${basePath}/`} className="text-emerald-500 hover:text-emerald-400 text-sm mb-8 inline-block">
+        <Link href="/" className="text-emerald-500 hover:text-emerald-400 text-sm mb-8 inline-block">
           &larr; Back to home
         </Link>
 

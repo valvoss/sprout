@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Job } from "@/lib/scraper";
 
 const ROLE_TYPES = ["All", "CFO", "CMO", "COO", "CTO"] as const;
@@ -82,14 +81,6 @@ export default async function JobsPage() {
   return (
     <main className="min-h-screen bg-slate-900">
       <div className="max-w-6xl mx-auto px-6 py-16 md:py-24">
-        {/* Back link */}
-        <Link
-          href="/"
-          className="text-slate-400 hover:text-white text-sm transition-colors mb-8 inline-block"
-        >
-          &larr; Back to Sprout
-        </Link>
-
         {/* Header */}
         <div className="mb-12">
           <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-1.5 mb-6">

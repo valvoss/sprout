@@ -21,10 +21,27 @@ function classifyRole(text: string): Job["roleType"] {
   return "Other";
 }
 
+// Words that should stay uppercase
+const UPPERCASE_WORDS = new Set([
+  "cfo", "cmo", "coo", "cto", "ceo", "cpo", "chro", "ciso",
+  "vp", "svp", "evp", "gm",
+  "ai", "ml", "it", "hr",
+  "b2b", "b2c", "saas", "erp", "crm",
+  "us", "uk", "eu",
+]);
+
+// Words that should stay lowercase (articles, prepositions)
+const LOWERCASE_WORDS = new Set(["a", "an", "the", "and", "or", "of", "in", "at", "for", "to", "with"]);
+
 function slugToTitleCase(slug: string): string {
-  return slug
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+  const words = slug.split("-");
+  return words
+    .map((w, i) => {
+      const lower = w.toLowerCase();
+      if (UPPERCASE_WORDS.has(lower)) return w.toUpperCase();
+      if (i > 0 && LOWERCASE_WORDS.has(lower)) return lower;
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
     .join(" ");
 }
 
