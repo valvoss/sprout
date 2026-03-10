@@ -3,15 +3,49 @@
 import { useState } from "react";
 import Link from "next/link";
 
+const TOP_INDUSTRIES = [
+  "SaaS / Software",
+  "Fintech",
+  "Healthcare / Health Tech",
+  "E-commerce / Retail",
+  "AI / ML",
+  "Real Estate / PropTech",
+  "Media / AdTech",
+  "Manufacturing / Industrial",
+  "Consumer Goods / CPG",
+  "Defense / Government",
+];
+
+const HOURS_OPTIONS = Array.from({ length: 19 }, (_, i) => 4 + i * 2); // 4, 6, 8 ... 40
+
 export default function JoinPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
+  const [otherIndustry, setOtherIndustry] = useState("");
+  const [rateAmount, setRateAmount] = useState("");
+  const [rateUnit, setRateUnit] = useState<"/hr" | "/mo">("/hr");
+
+  function toggleIndustry(industry: string) {
+    setSelectedIndustries((prev) =>
+      prev.includes(industry) ? prev.filter((i) => i !== industry) : [...prev, industry]
+    );
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
 
     const form = e.currentTarget;
+
+    const industriesList = [
+      ...selectedIndustries,
+      ...(otherIndustry.trim() ? [otherIndustry.trim()] : []),
+    ].join(", ");
+
+    const rateHourly = rateUnit === "/hr" ? rateAmount : "";
+    const rateMonthly = rateUnit === "/mo" ? rateAmount : "";
+
     const data = {
       full_name: (form.elements.namedItem("full_name") as HTMLInputElement).value,
       email: (form.elements.namedItem("email") as HTMLInputElement).value,
@@ -19,9 +53,11 @@ export default function JoinPage() {
       linkedin_url: (form.elements.namedItem("linkedin_url") as HTMLInputElement).value,
       primary_role: (form.elements.namedItem("primary_role") as HTMLSelectElement).value,
       years_experience: (form.elements.namedItem("years_experience") as HTMLInputElement).value,
-      industries_served: (form.elements.namedItem("industries_served") as HTMLInputElement).value,
-      availability_hours: (form.elements.namedItem("availability_hours") as HTMLInputElement).value,
-      rate_expectations: (form.elements.namedItem("rate_expectations") as HTMLInputElement).value,
+      industries_served: industriesList,
+      availability_hours: (form.elements.namedItem("availability_hours") as HTMLSelectElement).value,
+      rate_hourly: rateHourly,
+      rate_monthly: rateMonthly,
+      rate_expectations: `${rateAmount}${rateUnit}`,
       bio: (form.elements.namedItem("bio") as HTMLTextAreaElement).value,
     };
 
@@ -175,47 +211,82 @@ export default function JoinPage() {
             </div>
           </div>
 
+          {/* Industries */}
           <div>
-            <label htmlFor="industries_served" className="block text-sm font-medium text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-slate-300 mb-3">
               Industries served
             </label>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {TOP_INDUSTRIES.map((industry) => (
+                <button
+                  key={industry}
+                  type="button"
+                  onClick={() => toggleIndustry(industry)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                    selectedIndustries.includes(industry)
+                      ? "bg-emerald-500 border-emerald-500 text-white"
+                      : "bg-slate-900 border-slate-600 text-slate-300 hover:border-slate-400"
+                  }`}
+                >
+                  {industry}
+                </button>
+              ))}
+            </div>
             <input
               type="text"
-              id="industries_served"
-              name="industries_served"
-              required
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              placeholder="SaaS, Fintech, Healthcare..."
+              placeholder="Other (e.g. Climate Tech, Legal Tech...)"
+              value={otherIndustry}
+              onChange={(e) => setOtherIndustry(e.target.value)}
+              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Hours per week */}
             <div>
               <label htmlFor="availability_hours" className="block text-sm font-medium text-slate-300 mb-2">
                 Availability (hrs/week)
               </label>
-              <input
-                type="number"
+              <select
                 id="availability_hours"
                 name="availability_hours"
-                min="5"
-                max="40"
                 required
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                placeholder="20"
-              />
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              >
+                <option value="">Select hours</option>
+                {HOURS_OPTIONS.map((h) => (
+                  <option key={h} value={h}>{h} hrs/week</option>
+                ))}
+              </select>
             </div>
+
+            {/* Rate expectations */}
             <div>
-              <label htmlFor="rate_expectations" className="block text-sm font-medium text-slate-300 mb-2">
+              <label className="block text-sm font-medium text-slate-300 mb-2">
                 Rate expectations
               </label>
-              <input
-                type="text"
-                id="rate_expectations"
-                name="rate_expectations"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                placeholder="$150-200/hr or $5-8k/mo"
-              />
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="25"
+                    value={rateAmount}
+                    onChange={(e) => setRateAmount(e.target.value)}
+                    placeholder={rateUnit === "/hr" ? "200" : "8000"}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-7 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                </div>
+                <select
+                  value={rateUnit}
+                  onChange={(e) => setRateUnit(e.target.value as "/hr" | "/mo")}
+                  className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                >
+                  <option value="/hr">/hr</option>
+                  <option value="/mo">/mo</option>
+                </select>
+              </div>
             </div>
           </div>
 
