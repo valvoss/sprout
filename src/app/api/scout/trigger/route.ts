@@ -38,22 +38,21 @@ export async function POST(request: NextRequest) {
     try {
       await sendSMS(
         cleanPhone,
-        `Hi ${name}, this is Scout from Sprout. I'll be calling you in ~5 minutes to learn more about ${context}. Get somewhere quiet if you can!`
+        `Hi ${name}, this is Scout from Sprout. I'll be calling you shortly to learn more about ${context}. Get somewhere quiet if you can!`
       );
     } catch (smsError) {
       console.error("Failed to send pre-call SMS:", smsError);
       // Continue even if SMS fails — the call is more important
     }
 
-    // Schedule Vapi call (5 minute delay via setTimeout — in production use a job queue)
-    setTimeout(async () => {
-      try {
-        await triggerScoutCall({ phone: cleanPhone, type, formData });
-        console.log(`Scout call triggered for ${type}: ${cleanPhone}`);
-      } catch (callError) {
-        console.error("Failed to trigger Scout call:", callError);
-      }
-    }, 1 * 60 * 1000);
+    // Trigger Vapi call immediately (serverless: no setTimeout, function dies after response)
+    try {
+      await triggerScoutCall({ phone: cleanPhone, type, formData });
+      console.log(`Scout call triggered for ${type}: ${cleanPhone}`);
+    } catch (callError) {
+      console.error("Failed to trigger Scout call:", callError);
+      // Don't fail the request — SMS was sent, call failure is logged
+    }
 
     return NextResponse.json({ success: true, message: "Scout call scheduled" });
   } catch (error) {
