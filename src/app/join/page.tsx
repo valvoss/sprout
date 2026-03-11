@@ -98,13 +98,13 @@ export default function JoinPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold mb-4">Application received.</h1>
-          <p className="text-slate-300 text-lg mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-4">Application received.</h1>
+          <p className="text-slate-300 text-base sm:text-lg mb-8">
             Scout will review your profile and reach out within 48 hours.
           </p>
           <Link
             href="/"
-            className="inline-flex items-center justify-center px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-full transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 sm:py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-full transition-colors text-base"
           >
             Back to home
           </Link>
@@ -330,7 +330,7 @@ export default function JoinPage() {
               name="bio"
               rows={4}
               required
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
+              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
               placeholder="Share your experience, what you're passionate about, and what kind of companies you work best with..."
             />
           </div>

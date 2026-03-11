@@ -98,13 +98,13 @@ export default function HirePage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold mb-4">Scout is on it.</h1>
-          <p className="text-slate-300 text-lg mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-4">Scout is on it.</h1>
+          <p className="text-slate-300 text-base sm:text-lg mb-8">
             We&apos;ll be in touch within 24 hours with matched fractional talent for your team.
           </p>
           <Link
             href="/"
-            className="inline-flex items-center justify-center px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-full transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 sm:py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-full transition-colors text-base"
           >
             Back to home
           </Link>
@@ -249,7 +249,7 @@ export default function HirePage() {
                     onChange={(e) => setBudgetAmount(e.target.value)}
                     placeholder={budgetUnit === "/hr" ? "200" : "8000"}
                     required
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-7 pr-2 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-7 pr-3 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   />
                 </div>
                 <select
