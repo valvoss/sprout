@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
@@ -34,13 +35,20 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen bg-black flex items-center justify-center">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm bg-gray-900 border border-gray-800 rounded-lg p-8"
+        className="w-full max-w-sm bg-gray-950 border border-gray-800 rounded-lg p-8"
       >
-        <h1 className="text-xl font-semibold mb-1">Sprout Admin</h1>
-        <p className="text-sm text-gray-400 mb-6">Enter password to continue</p>
+        <div className="flex justify-center mb-8">
+          <Image
+            src="https://cdn.prod.website-files.com/68bb521cef57ca737a668ec0/68bb524747c79869428f76b1_invictus_logo_extra_bold.svg"
+            alt="Invictus"
+            width={180}
+            height={48}
+            style={{ filter: "brightness(0) invert(1)" }}
+          />
+        </div>
 
         <input
           type="password"
@@ -48,7 +56,7 @@ export default function AdminLoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
           autoFocus
-          className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-emerald-500 mb-4"
+          className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded text-sm focus:outline-none focus:border-white mb-4 text-white placeholder-gray-600"
         />
 
         {error && (
@@ -58,7 +66,7 @@ export default function AdminLoginPage() {
         <button
           type="submit"
           disabled={loading || !password}
-          className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 rounded text-sm font-medium transition-colors"
+          className="w-full py-2 bg-white hover:bg-gray-200 disabled:opacity-30 rounded text-sm font-medium transition-colors text-black"
         >
           {loading ? "Signing in..." : "Sign in"}
         </button>

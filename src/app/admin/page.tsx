@@ -195,7 +195,12 @@ export default function AdminDashboard() {
       {/* Header */}
       <header className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h1 className="text-lg font-semibold">Sprout Admin</h1>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://cdn.prod.website-files.com/68bb521cef57ca737a668ec0/68bb524747c79869428f76b1_invictus_logo_extra_bold.svg"
+            alt="Invictus"
+            style={{ height: 28, filter: "brightness(0) invert(1)" }}
+          />
           <nav className="flex gap-1 ml-6">
             {tabs.map((t) => (
               <button
