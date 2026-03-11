@@ -49,6 +49,23 @@ export async function POST(request: NextRequest) {
       await updateTalentProfile(phone, transcript, extraction);
     }
 
+    // Update scout_calls record with completed status, transcript, and extraction
+    if (message.call?.id) {
+      const { error: callUpdateError } = await supabaseAdmin
+        .from("scout_calls")
+        .update({
+          status: "completed",
+          transcript,
+          extraction,
+          completed_at: new Date().toISOString(),
+        })
+        .eq("vapi_call_id", message.call.id);
+
+      if (callUpdateError) {
+        console.error("Failed to update scout_call record:", callUpdateError);
+      }
+    }
+
     return NextResponse.json({ received: true, type });
   } catch (error) {
     console.error("Vapi webhook error:", error);
