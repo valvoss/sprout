@@ -115,7 +115,7 @@ export default function JoinPage() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
-      <div className="max-w-2xl mx-auto px-6 py-16 md:py-24">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12 md:py-24">
         <Link href="/" className="text-emerald-500 hover:text-emerald-400 text-sm mb-8 inline-block">
           &larr; Back to home
         </Link>
@@ -127,7 +127,7 @@ export default function JoinPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-slate-800 rounded-2xl p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="bg-slate-800 rounded-2xl p-4 sm:p-8 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label htmlFor="full_name" className="block text-sm font-medium text-slate-300 mb-2">
@@ -138,7 +138,7 @@ export default function JoinPage() {
                 id="full_name"
                 name="full_name"
                 required
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 placeholder="John Doe"
               />
             </div>
@@ -151,7 +151,7 @@ export default function JoinPage() {
                 id="email"
                 name="email"
                 required
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 placeholder="john@example.com"
               />
             </div>
@@ -166,7 +166,7 @@ export default function JoinPage() {
                 type="tel"
                 id="phone"
                 name="phone"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 placeholder="+1 (555) 000-0000"
               />
             </div>
@@ -178,7 +178,7 @@ export default function JoinPage() {
                 type="url"
                 id="linkedin_url"
                 name="linkedin_url"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 placeholder="linkedin.com/in/johndoe"
               />
             </div>
@@ -193,7 +193,7 @@ export default function JoinPage() {
                 id="primary_role"
                 name="primary_role"
                 required
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               >
                 <option value="">Select role</option>
                 <option value="CFO">CFO</option>
@@ -214,7 +214,7 @@ export default function JoinPage() {
                 min="1"
                 max="50"
                 required
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 placeholder="15"
               />
             </div>
@@ -231,7 +231,7 @@ export default function JoinPage() {
                   key={industry}
                   type="button"
                   onClick={() => toggleIndustry(industry)}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                  className={`px-4 py-2.5 rounded-full text-sm font-medium border transition-colors min-h-[44px] flex items-center ${
                     selectedIndustries.includes(industry)
                       ? "bg-emerald-500 border-emerald-500 text-white"
                       : "bg-slate-900 border-slate-600 text-slate-300 hover:border-slate-400"
@@ -243,7 +243,7 @@ export default function JoinPage() {
               <button
                 type="button"
                 onClick={() => toggleIndustry("Other")}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                className={`px-4 py-2.5 rounded-full text-sm font-medium border transition-colors min-h-[44px] flex items-center ${
                   selectedIndustries.includes("Other")
                     ? "bg-emerald-500 border-emerald-500 text-white"
                     : "bg-slate-900 border-slate-600 text-slate-300 hover:border-slate-400"
@@ -255,7 +255,7 @@ export default function JoinPage() {
                 <button
                   type="button"
                   onClick={() => setIndustriesExpanded(true)}
-                  className="px-3 py-1.5 rounded-full text-sm font-medium border border-dashed border-slate-600 text-slate-400 hover:border-slate-400 hover:text-slate-300 transition-colors"
+                  className="px-4 py-2.5 rounded-full text-sm font-medium border border-dashed border-slate-600 text-slate-400 hover:border-slate-400 hover:text-slate-300 transition-colors min-h-[44px] flex items-center"
                 >
                   + More
                 </button>
@@ -267,7 +267,7 @@ export default function JoinPage() {
                 placeholder="e.g. Climate Tech, Legal Tech..."
                 value={otherIndustry}
                 onChange={(e) => setOtherIndustry(e.target.value)}
-                className="mt-3 w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+                className="mt-3 w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
             )}
           </div>
@@ -282,7 +282,7 @@ export default function JoinPage() {
                 id="availability_hours"
                 name="availability_hours"
                 required
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               >
                 <option value="">Select hours</option>
                 {HOURS_OPTIONS.map((h) => (
@@ -306,13 +306,13 @@ export default function JoinPage() {
                     value={rateAmount}
                     onChange={(e) => setRateAmount(e.target.value)}
                     placeholder={rateUnit === "/hr" ? "200" : "8000"}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-7 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-7 pr-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   />
                 </div>
                 <select
                   value={rateUnit}
                   onChange={(e) => setRateUnit(e.target.value as "/hr" | "/mo")}
-                  className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent min-w-[72px]"
                 >
                   <option value="/hr">/hr</option>
                   <option value="/mo">/mo</option>

@@ -115,7 +115,7 @@ export default function HirePage() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
-      <div className="max-w-2xl mx-auto px-6 py-16 md:py-24">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12 md:py-24">
         <Link href="/" className="text-emerald-500 hover:text-emerald-400 text-sm mb-8 inline-block">
           &larr; Back to home
         </Link>
@@ -127,7 +127,7 @@ export default function HirePage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-slate-800 rounded-2xl p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="bg-slate-800 rounded-2xl p-4 sm:p-8 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label htmlFor="company_name" className="block text-sm font-medium text-slate-300 mb-2">
@@ -138,7 +138,7 @@ export default function HirePage() {
                 id="company_name"
                 name="company_name"
                 required
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 placeholder="Acme Inc."
               />
             </div>
@@ -151,7 +151,7 @@ export default function HirePage() {
                 id="contact_name"
                 name="contact_name"
                 required
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 placeholder="Jane Smith"
               />
             </div>
@@ -167,7 +167,7 @@ export default function HirePage() {
                 id="email"
                 name="email"
                 required
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 placeholder="jane@acme.com"
               />
             </div>
@@ -180,7 +180,7 @@ export default function HirePage() {
                 id="phone"
                 name="phone"
                 required
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 placeholder="+1 (555) 000-0000"
               />
             </div>
@@ -198,7 +198,7 @@ export default function HirePage() {
                 required
                 value={roleNeeded}
                 onChange={(e) => setRoleNeeded(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               >
                 <option value="">Select role</option>
                 <option value="CFO">CFO</option>
@@ -214,7 +214,7 @@ export default function HirePage() {
                   value={otherRole}
                   onChange={(e) => setOtherRole(e.target.value)}
                   required
-                  className="mt-2 w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="mt-2 w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />
               )}
             </div>
@@ -226,7 +226,7 @@ export default function HirePage() {
                 id="hours_per_week"
                 name="hours_per_week"
                 required
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               >
                 <option value="">Select</option>
                 {HOURS_OPTIONS.map((h) => (
@@ -249,13 +249,13 @@ export default function HirePage() {
                     onChange={(e) => setBudgetAmount(e.target.value)}
                     placeholder={budgetUnit === "/hr" ? "200" : "8000"}
                     required
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-7 pr-2 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-7 pr-2 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   />
                 </div>
                 <select
                   value={budgetUnit}
                   onChange={(e) => setBudgetUnit(e.target.value as "/hr" | "/mo")}
-                  className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent min-w-[72px]"
                 >
                   <option value="/hr">/hr</option>
                   <option value="/mo">/mo</option>
@@ -275,7 +275,7 @@ export default function HirePage() {
                   key={industry}
                   type="button"
                   onClick={() => toggleIndustry(industry)}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                  className={`px-4 py-2.5 rounded-full text-sm font-medium border transition-colors min-h-[44px] flex items-center ${
                     selectedIndustries.includes(industry)
                       ? "bg-emerald-500 border-emerald-500 text-white"
                       : "bg-slate-900 border-slate-600 text-slate-300 hover:border-slate-400"
@@ -287,7 +287,7 @@ export default function HirePage() {
               <button
                 type="button"
                 onClick={() => toggleIndustry("Other")}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                className={`px-4 py-2.5 rounded-full text-sm font-medium border transition-colors min-h-[44px] flex items-center ${
                   selectedIndustries.includes("Other")
                     ? "bg-emerald-500 border-emerald-500 text-white"
                     : "bg-slate-900 border-slate-600 text-slate-300 hover:border-slate-400"
@@ -299,7 +299,7 @@ export default function HirePage() {
                 <button
                   type="button"
                   onClick={() => setIndustriesExpanded(true)}
-                  className="px-3 py-1.5 rounded-full text-sm font-medium border border-dashed border-slate-600 text-slate-400 hover:border-slate-400 hover:text-slate-300 transition-colors"
+                  className="px-4 py-2.5 rounded-full text-sm font-medium border border-dashed border-slate-600 text-slate-400 hover:border-slate-400 hover:text-slate-300 transition-colors min-h-[44px] flex items-center"
                 >
                   + More
                 </button>
@@ -311,7 +311,7 @@ export default function HirePage() {
                 placeholder="e.g. Climate Tech, Legal Tech..."
                 value={otherIndustry}
                 onChange={(e) => setOtherIndustry(e.target.value)}
-                className="mt-3 w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+                className="mt-3 w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
             )}
           </div>
@@ -325,7 +325,7 @@ export default function HirePage() {
               name="description"
               rows={4}
               required
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
+              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
               placeholder="We're looking for a fractional CFO to help with fundraising prep and financial modeling..."
             />
           </div>
